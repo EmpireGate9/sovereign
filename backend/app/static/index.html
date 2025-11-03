@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PAI‑6 Dashboard — Sovereign</title>
+  <style>
+    body{font-family:system-ui,Arial;margin:0}
+    header{padding:16px 20px;border-bottom:1px solid #e5e5e5;display:flex;justify-content:space-between;align-items:center}
+    main{padding:20px;display:grid;gap:16px}
+    .card{border:1px solid #eee;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    button{padding:10px 14px;border-radius:10px;border:1px solid #111;background:#fff;cursor:pointer}
+    input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #bbb}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+    .ok{color:#0a7d12}
+  </style>
+</head>
+<body>
+  <header>
+    <strong>PAI‑6 Sovereign v3.2.3</strong>
+    <nav><a href="/">الرئيسية</a></nav>
+  </header>
+  <main>
+    <section class="grid">
+      <div class="card">
+        <h3>Health</h3>
+        <pre id="health">checking…</pre>
+        <button onclick="checkHealth()">تحديث</button>
+      </div>
+      <div class="card">
+        <h3>EVM</h3>
+        <div class="row">
+          <input id="bac" type="number" placeholder="BAC"/>
+          <input id="ev" type="number" placeholder="EV"/>
+          <input id="pv" type="number" placeholder="PV"/>
+          <input id="ac" type="number" placeholder="AC"/>
+        </div>
+        <button onclick="evm()">احسب</button>
+        <pre id="evm_out"></pre>
+      </div>
+      <div class="card">
+        <h3>Procurement ☠️</h3>
+        <textarea id="proc" rows="6" placeholder='[{"name":"Rebar","lead_days":30,"days_until_need":40}]'></textarea>
+        <button onclick="proc()">تحليل</button>
+        <pre id="proc_out"></pre>
+      </div>
+      <div class="card">
+        <h3>Projects</h3>
+        <div class="row">
+          <input id="pid" placeholder="ID"/>
+          <input id="pname" placeholder="Name"/>
+        </div>
+        <button onclick="addProject()">إضافة</button>
+        <button onclick="listProjects()">قائمة</button>
+        <pre id="projects_out"></pre>
+      </div>
+    </section>
+  </main>
+<script>
+async function checkHealth(){
+  const r = await fetch('/api/system/healthz'); 
+  document.getElementById('health').textContent = JSON.stringify(await r.json(), null, 2);
+}
+async function evm(){
+  const body = {bac: +document.getElementById('bac').value || 0,
+                ev: +document.getElementById('ev').value || 0,
+                pv: +document.getElementById('pv').value || 0,
+                ac: +document.getElementById('ac').value || 0};
+  const r = await fetch('/api/evm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  document.getElementById('evm_out').textContent = JSON.stringify(await r.json(), null, 2);
+}
+async function proc(){
+  let body;
+  try{ body = {items: JSON.parse(document.getElementById('proc').value)} }catch(e){ body = {items: []} }
+  const r = await fetch('/api/procurement',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  document.getElementById('proc_out').textContent = JSON.stringify(await r.json(), null, 2);
+}
+async function addProject(){
+  const body = {id: document.getElementById('pid').value || String(Date.now()),
+                name: document.getElementById('pname').value || 'Demo'};
+  const r = await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  listProjects();
+}
+async function listProjects(){
+  const r = await fetch('/api/projects');
+  document.getElementById('projects_out').textContent = JSON.stringify(await r.json(), null, 2);
+}
+checkHealth();
+</script>
+</body>
+</html>

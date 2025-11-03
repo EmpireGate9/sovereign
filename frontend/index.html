@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PAI‑6 Sovereign — Frontend</title>
+  <style>
+    body{font-family:system-ui,Arial;margin:0}
+    header{padding:16px 20px;border-bottom:1px solid #e5e5e5;display:flex;justify-content:space-between;align-items:center}
+    main{padding:20px;display:grid;gap:16px}
+    .card{border:1px solid #eee;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    button{padding:10px 14px;border-radius:10px;border:1px solid #111;background:#fff;cursor:pointer}
+    input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #bbb}
+  </style>
+</head>
+<body>
+  <header>
+    <strong>PAI‑6 Sovereign — Frontend Export</strong>
+    <nav><a href="#" onclick="ping()">Ping</a></nav>
+  </header>
+  <main>
+    <div class="card">
+      <h3>Chat (Local Mock)</h3>
+      <textarea id="chat_in" rows="4" placeholder="اكتب هنا…"></textarea>
+      <button onclick="mockChat()">أرسل</button>
+      <pre id="chat_out"></pre>
+    </div>
+    <div class="card">
+      <h3>مايك/كاميرا</h3>
+      <button onclick="mic()">تشغيل المايك</button>
+      <button onclick="cam()">تشغيل الكاميرا</button>
+      <video id="v" autoplay playsinline style="max-width:100%;border-radius:12px"></video>
+    </div>
+  </main>
+<script>
+function mockChat(){
+  const t = document.getElementById('chat_in').value.trim();
+  document.getElementById('chat_out').textContent = "Echo: " + t;
+}
+async function mic(){
+  try{ await navigator.mediaDevices.getUserMedia({audio:true}); alert("تم تفعيل المايك"); }catch(e){ alert("تعذر تفعيل المايك"); }
+}
+async function cam(){
+  try{ const s = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('v').srcObject = s; }catch(e){ alert("تعذر تفعيل الكاميرا"); }
+}
+async function ping(){
+  try{ const r = await fetch('/api/system/healthz'); alert("Backend جاهز"); }catch(e){ alert("لم يتم العثور على Backend (تأكد من النشر)"); }
+}
+</script>
+</body>
+</html>

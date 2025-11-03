@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  pai6:
+    build: .
+    image: pai6-sovereign:v3.2.3
+    ports:
+      - "8080:8080"
+    environment:
+      - ENV=local
