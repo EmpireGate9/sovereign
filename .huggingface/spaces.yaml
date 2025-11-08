@@ -1,0 +1,4 @@
+title: sovereign-launch
+emoji: 🚀
+sdk: docker
+hf_oauth: true
